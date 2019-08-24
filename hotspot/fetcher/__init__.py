@@ -11,12 +11,15 @@ from nbconvert.exporters.base import export
 class Fetcher():
     
     def fetch_result(self, DrawID):
-        url="https://www.californialottery.com/sitecore/content/LotteryHome/play/draw-games/hot-spot/draw-detail?draw=";
+        #url="https://www.californialottery.com/sitecore/content/LotteryHome/play/draw-games/hot-spot/draw-detail?draw=";
+        url="https://www.calottery.com/play/draw-games/hot-spot/draw-detail?draw=";
         url_str=url+str(DrawID);
         
         urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
-        http = urllib3.PoolManager()
-        #http = urllib3.PoolManager(cert_reqs='CERT_REQUIRED')
+        
+        #http = urllib3.PoolManager()
+      
+        http = urllib3.PoolManager(cert_reqs='CERT_REQUIRED', ca_certs=certifi.where())
         response = http.request('GET', url_str)
         doc = BeautifulSoup(response.data, 'html.parser');
         drw = doc.find("h3",{"class":"hotspot-callout-text"});

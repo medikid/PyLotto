@@ -12,6 +12,117 @@ class HotSpot:
     def get_last_draw_id(self):
         res = iresult.iResult()
         return res.getLastDrawID()
+        
+    def derive_draw(self, draw_id):
+        new_draw=idraw.iDraw(draw_id);
+        new_draw.derive()
+        new_draw.db_save()
+        
+    def derive_draws(self, start_id, end_id):
+        next_id = start_id;
+        while(next_id <= end_id):
+            self.derive_draw(next_id);
+            next_id += 1;
+            
+    def derive_depth(self, draw_id):
+        new_depth=idepth.iDepth(draw_id);
+        new_depth.derive()
+        new_depth.db_save()
+        
+    def derive_depths(self, start_id, end_id):
+        next_id = start_id;
+        while(next_id <= end_id):
+            self.derive_depth(next_id);
+            next_id += 1;
+        
+    def find_gaps_draws(self, start_id, end_id):
+        gaps= list();
+        next_id=start_id+1;
+        master_draws_d = self.get_all_draws();
+        
+        switch_on=0;
+        while(next_id < end_id):
+            try:
+                d = master_draws_d[next_id];
+                #print("Size of ", next_id, len(master_results_d[next_id]));
+                
+                if switch_on == 0:
+                    pass;
+                else:
+                    switch_on = str(switch_on) + " - " + str(next_id - 1);
+                    gaps.append(switch_on);
+                    switch_on = 0;
+                    
+            except KeyError:
+                if switch_on==0:
+                    switch_on=next_id;
+                    #gaps.append(switch_on)
+                else:
+                    pass;
+            
+            next_id += 1;
+        gaps.append(next_id);
+        print("Gaps Draws:", gaps);
+        
+    def find_gaps_results(self, start_id, end_id):
+        gaps= list();
+        next_id=start_id+1;
+        master_results_d = self.get_all_results();
+        
+        switch_on=0;
+        while(next_id < end_id):
+            try:
+                d = master_results_d[next_id];
+                #print("Size of ", next_id, len(master_results_d[next_id]));
+                
+                if switch_on == 0:
+                    pass;
+                else:
+                    switch_on = str(switch_on) + " - " + str(next_id - 1);
+                    gaps.append(switch_on);
+                    switch_on = 0;
+                    
+            except KeyError:
+                if switch_on==0:
+                    switch_on=next_id;
+                    #gaps.append(switch_on)
+                else:
+                    pass;
+            
+            next_id += 1;
+        gaps.append(next_id);
+        print("Gaps Results:", gaps)
+    
+    def find_gaps_depths(self, start_id, end_id):
+        gaps= list();
+        next_id=start_id+1;
+        master_depths_d = self.get_all_depths();
+        
+        switch_on=0;
+        while(next_id < end_id):
+            try:
+                d = master_depths_d[next_id];
+                #print("Size of ", next_id, len(master_results_d[next_id]));
+                
+                if switch_on == 0:
+                    pass;
+                else:
+                    switch_on = str(switch_on) + " - " + str(next_id - 1);
+                    gaps.append(switch_on);
+                    switch_on = 0;
+                    
+            except KeyError:
+                if switch_on==0:
+                    switch_on=next_id;
+                    #gaps.append(switch_on)
+                else:
+                    pass;
+            
+            next_id += 1;
+        gaps.append(next_id);
+        print("Gaps Depths:", gaps);
+        
+    
     
     def sync(self):
         last_draw_id = self.get_last_draw_id();
@@ -34,7 +145,7 @@ class HotSpot:
             new_depth.toString()          
              
             next_draw_id += 1;
-            
+        print("All Done!")
     
     def get_all_results(self):            
         master_dict = {}
@@ -152,5 +263,5 @@ class HotSpot:
         np.savez(data_folder+'test_3', ids=master_ids[35000:36000], test=master_depths[35000:36000], target=master_draws[35001:36001]);
            
 h = HotSpot();
-h.sync()
+#h.sync()
 #print(h.save_master_matrix())

@@ -1,0 +1,12 @@
+sqlalchemy
+mysqlclient
+pymysql
+
+
+certifi
+urllib3
+bs4
+
+numpy
+flask
+nbconvert

@@ -104,9 +104,13 @@ class DBBase():
             filter_statement += self.__className.exchange_id == self.exchange_id
             
         addl_filter_statement = filterKey == filterValue
-        result = self.db.session.query(self.__className).filter(filter_statement , addl_filter_statement)
+        print('addl_filter_statement', addl_filter_statement)
+        #result = self.db.session.query(self.__className).filter(filter_statement , addl_filter_statement)
+        
+        result = self.db.session.query(self.__className).filter(addl_filter_statement)
+        
         #result = query.filter(addl_filter_statement)
-        #print('Filter Statement', filter_statement)
+        
         
         return result;
     
@@ -136,5 +140,3 @@ class DBBase():
             self.db.session.commit()
             print('Object saved')
             return self
-        
-    
