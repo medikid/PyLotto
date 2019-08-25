@@ -7,15 +7,18 @@ from sqlalchemy.orm import sessionmaker
 class db_init():
     db_engine='';
     session='';
-    db_user='db_user';
-    #db_pword='';
-    #db_host='localhost'    
+    
+    #db_host='192.168.0.111'
+    #db_user='db_user'
+    #db_pword='db_pwd'
+
+    db_host='localhost'
+    db_user='root'
+    db_pword=''
+    
     db_port=3306
     db_name='lotto_hotspot'
-    
-    db_pword='db_pwd'
-    db_host='192.168.0.111'
-    
+
     def __init__(self):
         self.init_db_engine();
         self.init_session();

@@ -1,5 +1,5 @@
 
-from hotspot.models import iresult, idraw, idepth;
+from hotspot.models import iresult, idraw, idepth, iticket;
 from hotspot.fetcher import Fetcher
 from hotspot.db import db_init;
 from hotspot.db.db_base import DBBase
@@ -63,6 +63,10 @@ class HotSpot:
             next_id += 1;
         gaps.append(next_id);
         print("Gaps Draws:", gaps);
+
+    def setupTickets(self):
+        t = iticket.iTicket();
+        t.create_table();
         
     def find_gaps_results(self, start_id, end_id):
         gaps= list();

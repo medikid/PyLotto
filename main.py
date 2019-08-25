@@ -15,7 +15,10 @@ ssl._create_default_https_context = ssl._create_unverified_context
 #f.get_results();
 
 h = HotSpot();
-h.sync()
+#h.sync()
+h.setupTickets();
+
+
 #h.derive_draws(2439018, 2494108);
 #h.derive_depths(2439018, 2494107)
 #h.find_gaps_results(2277311, 2494108);
