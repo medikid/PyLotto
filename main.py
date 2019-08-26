@@ -1,4 +1,5 @@
 from hotspot import HotSpot, fetcher;
+from hotspot.models import iticket, iprize, isession
 import os, ssl
 
 #run py in background - nohup python main.py &
@@ -18,6 +19,8 @@ h = HotSpot();
 #h.sync()
 h.setupTickets();
 
+p = isession.iSession();
+p.add_table();
 
 #h.derive_draws(2439018, 2494108);
 #h.derive_depths(2439018, 2494107)
