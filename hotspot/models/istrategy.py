@@ -1,5 +1,31 @@
-'''
-Created on Jan 21, 2018
+from sqlalchemy import Column, Integer, Numeric, String, VARCHAR, DECIMAL, DateTime, Float, Boolean, LargeBinary, Binary, SmallInteger, BigInteger
+from sqlalchemy import select, delete, update, insert
+from sqlalchemy.ext.declarative import declarative_base
 
-@author: somaj
-'''
+from sqlalchemy import Integer, DateTime
+from wsgiref.handlers import format_date_time
+
+from hotspot.db import db_init;
+from hotspot.db.db_base import DBBase
+from hotspot.models import Base, ipick, iresult, idraw, ibin
+
+import numpy as np
+
+class iStrategy(Base, DBBase):
+    __tablename__ = 'strategies'
+    db = db_init();
+
+    Strat_ID=Column(VARCHAR(11))
+Strategy=Column(SmalllInteger)
+Major_version=Column(SmallInteger)
+tickets_total=Column(SmallInteger)
+tickets_claimed=Column(Integer)
+cost_total=Column(DECIMAL(11,2))
+prize_total=Column(DECIMAL(11,2))
+pnl=Column(DECIMAL(11,2))
+match_max=Column(Integer)
+prize_max=Column(DECIMAL(11,2))
+match_min=Column(Integer)
+prize_min=Column(DECIMAL(11,2))
+match_average=Column(Integer)
+prize_average=Column(DECIMAL(11,2))

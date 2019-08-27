@@ -1,5 +1,6 @@
 from hotspot import HotSpot, fetcher;
 from hotspot.models import iticket, iprize, isession
+from hotspot.controllers import prizes
 import os, ssl
 
 #run py in background - nohup python main.py &
@@ -17,10 +18,12 @@ ssl._create_default_https_context = ssl._create_unverified_context
 
 h = HotSpot();
 #h.sync()
-h.setupTickets();
+#.setupTickets();
 
-p = isession.iSession();
-p.add_table();
+p = prizes.Prizes();
+p.setup_prize_list()
+prz = p.get_prize(10,5);
+print("Prize ID", prz.prz_id,": ", prz.prize);
 
 #h.derive_draws(2439018, 2494108);
 #h.derive_depths(2439018, 2494107)

@@ -11,11 +11,11 @@ from hotspot.models import Base, ipick, iresult, idraw, ibin
 
 import numpy as np
 
-class iPrize(Base, DBBase):
+class iSession(Base, DBBase):
     __tablename__ = 'sessions'
     db = db_init();
 
-    sess_id=Column(Integer, primary_key=True, autoincrement=False)
+    sess_id=Column(BigInteger, primary_key=True, autoincrement=False)
     strat_id=Column(VARCHAR(11))
     date_time=Column(DateTime)
     tickets_total=Column(Integer)
@@ -33,7 +33,7 @@ class iPrize(Base, DBBase):
 
 
     def __init__(self):
-        return 0;
+        self.sess_id = 0;
 
     def add_table(self):
         self.create_table();

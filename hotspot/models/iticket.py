@@ -20,7 +20,7 @@ class iTicket(Base, DBBase):
     picks_total=Column(Integer)
     opt_x=Column(Boolean)
     strat_id=Column(String(11))
-    session_id=Column(Integer)
+    session_id=Column(BigInteger)
     t1=Column(SmallInteger)
     t2=Column(SmallInteger)
     t3=Column(SmallInteger)

@@ -38,9 +38,18 @@ class iPrize(Base, DBBase):
 
     def add_table(self):
         self.create_table();
+
+    def derive_prize_id(self, pick, matches):
+        self.prz_id = self.lottery + "_" + str(self.picks) + "_" + str(self.matches)
         
 
-    def get_prize(self, picks, matches):
-        p = 0;
+    def setup(self, picks, matches):
+        self.derive_prize_id(picks, matches);
+        prz = self.db.session.query(iPrize).filter(iPrize.prz_id==self.prz_id).first();
 
         return p;
+
+    def to_string(self):
+        return self.prz_id
+
+    
