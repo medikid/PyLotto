@@ -10,6 +10,7 @@ from hotspot.db.db_base import DBBase
 from hotspot.models import Base, ipick, iresult, idraw, ibin
 
 import numpy as np
+from datetime import datetime
 
 class iSession(Base, DBBase):
     __tablename__ = 'sessions'
@@ -33,9 +34,15 @@ class iSession(Base, DBBase):
 
 
     def __init__(self):
-        self.sess_id = 0;
+        self.generateSessionID();
 
     def add_table(self):
         self.create_table();
+
+    def generateSessionID(self):
+        sess_id_format = "%Y%m%d%H%M%S"
+        
+        self.sess_id = datetime.now().strftime(sess_id_format)
+        print(self.sess_id)
 
     

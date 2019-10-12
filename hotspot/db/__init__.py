@@ -24,7 +24,7 @@ class db_init():
         self.init_session();
         
     def init_db_engine(self):
-        print('mysql+mysqldb://'+self.db_user+':'+self.db_pword+'@'+self.db_host+':'+str(self.db_port)+'/'+self.db_name)
+        #print('mysql+mysqldb://'+self.db_user+':'+self.db_pword+'@'+self.db_host+':'+str(self.db_port)+'/'+self.db_name)
         self.db_engine = create_engine('mysql+mysqldb://'+self.db_user+':'+self.db_pword+'@'+self.db_host+':'+str(self.db_port)+'/'+self.db_name);
         #self.db_engine = create_engine('mysql+mysqldb://db_user:db_pwd@192.168.0.111:3306/lotto_hotspot');
   
