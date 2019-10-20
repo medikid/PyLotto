@@ -5,15 +5,66 @@ from utils import Utils
 
 from hotspot.models import iresult, ipick
 from nbconvert.exporters.base import export
+import datetime
 #from keno.fetcher import Fetcher
 
 
 class Fetcher():
-    
+
     def fetch_result(self, DrawID):
         #url="https://www.californialottery.com/sitecore/content/LotteryHome/play/draw-games/hot-spot/draw-detail?draw=";
         url="https://www.calottery.com/play/draw-games/hot-spot/draw-detail?draw=";
-        url_str=url+str(DrawID);
+        
+        new_url="https://www.calottery.com/draw-games/hot-spot/past-winning-numbers?query="
+        
+        url_str=new_url+str(DrawID);
+        
+        urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+        
+        #http = urllib3.PoolManager()
+      
+        http = urllib3.PoolManager(cert_reqs='CERT_REQUIRED', ca_certs=certifi.where())
+        response = http.request('GET', url_str)
+        doc = BeautifulSoup(response.data, 'html.parser');
+        
+        drw = doc.find("div",{"class":"card-body"});
+        dttm = drw.find("p",{"class":"htspt__cards--next-draw-date"}).get_text().strip().split(":")
+        date=dttm[1].split("\n")[0].strip()
+        time_hr="{:02d}".format(int(dttm[2]))
+        time_mn_am=dttm[3].split(" ")
+        time_mn=time_mn_am[0]
+        time_ampm=time_mn_am[1].split(".")
+        time_AMPM=time_ampm[0].upper()+time_ampm[1].upper()
+        str_dttm = date + " " +time_hr +":"+ time_mn +" " + time_AMPM
+        dttm_format="%B %d, %Y %I:%M %p"
+        
+        draw_date_time = Utils.parseDateTime(str_dttm, dttm_format)
+        
+        uls = drw.find("ul", {"class": "list-inline"});
+        lis = uls.find_all("li", {"class": "list-inline-item blue-num"});
+        lis_bonus = uls.find("li", {"class": "list-inline-item yellow-num"});
+        
+        pick_array=[]
+        pick_mega=0;
+        for li in lis:            
+            pick_array.append(int(li.get_text()))
+        
+        pick_mega=int(lis_bonus.get_text());
+        pick_array.append(int(pick_mega))
+        print(draw_date_time, pick_array, "bonus",pick_mega);
+        
+        pick=ipick.iPick(pick_array)
+        r = iresult.iResult(DrawID, draw_date_time, pick , pick_mega )
+        return r;
+
+    
+    def fetch_result_old(self, DrawID):
+        #url="https://www.californialottery.com/sitecore/content/LotteryHome/play/draw-games/hot-spot/draw-detail?draw=";
+        #url="https://www.calottery.com/play/draw-games/hot-spot/draw-detail?draw=";
+        
+        new_url="https://www.calottery.com/draw-games/hot-spot/past-winning-numbers?query="
+        
+        url_str=new_url+str(DrawID);
         
         urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
         

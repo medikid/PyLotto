@@ -1,7 +1,9 @@
 from hotspot.models.istrategy import iStrategy
 
+from hotspot.strategies.rand import RAND
 
-class Strat_rand_01_001(iStrategy):
+
+class Strat_rand_01_001(RAND):
     STRAT_ID = "RAND.01.001"
     STRAT="RAND"
     MAJOR = 1
@@ -17,3 +19,6 @@ class Strat_rand_01_001(iStrategy):
     def run(self, draw_id, no_tickets, no_picks):
         print("Run from "+self.STRAT_ID)
         print("Pick "+str(no_picks)+" nums and get "+str(no_tickets)+" tickets for Draw_Id "+str(draw_id))
+
+        ticket = super().pickRand(list(range(1,80)), no_picks)
+        print(ticket)

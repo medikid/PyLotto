@@ -104,7 +104,7 @@ class DBBase():
             filter_statement += self.__className.exchange_id == self.exchange_id
             
         addl_filter_statement = filterKey == filterValue
-        print('addl_filter_statement', addl_filter_statement)
+        #print('addl_filter_statement', addl_filter_statement)
         #result = self.db.session.query(self.__className).filter(filter_statement , addl_filter_statement)
         
         result = self.db.session.query(self.__className).filter(addl_filter_statement)
@@ -129,7 +129,7 @@ class DBBase():
     def db_get_or_create(self):
         query = self.selectWhere(self.__primaryKeyField, self.__primaryKeyValue)
         #query = self.db.session.query(self.__className).filter(self.__primaryKeyField == self.__primaryKeyValue)
-        print(query)
+        #print(query)
         instance = query.first();
         
         if instance:
@@ -138,5 +138,5 @@ class DBBase():
         else:
             self.db.session.add(self)
             self.db.session.commit()
-            print('Object saved')
+            #print('Object saved')
             return self
