@@ -30,24 +30,41 @@ class iPrize(Base, DBBase):
 
     tickDict={0:0}
     
-    def __init__(self):
+    def __init__(self, picks=0, matches=0):
         #CONSTANTS#
         self.lottery = "Hotspot"
         self.country = "USA";
-        self.state = "CA"
+        self.state = "CA"   
+
+        #load
+        if(picks > 0):
+            self.setup(picks, matches);
+
 
     def add_table(self):
         self.create_table();
 
-    def derive_prize_id(self, pick, matches):
+    def derive_prize_id(self, picks, matches):
+        self.picks = picks;
+        self.matches = matches;
         self.prz_id = self.lottery + "_" + str(self.picks) + "_" + str(self.matches)
-        
+        print("PRIZE ID: ", self.prz_id)
 
     def setup(self, picks, matches):
         self.derive_prize_id(picks, matches);
         prz = self.db.session.query(iPrize).filter(iPrize.prz_id==self.prz_id).first();
 
-        return p;
+        self.lottery=prz.lottery
+        self.country=prz.country
+        self.state=prz.state
+        self.picks=prz.picks
+        self.matches=prz.matches
+        self.cost=prz.cost
+        self.prize=prz.prize
+        self.cost_x=prz.cost_x
+        self.prize_x=prz.prize_x
+        self.odds=prz.odds
+        self.odds_x=prz.odds_x
 
     def to_string(self):
         return self.prz_id

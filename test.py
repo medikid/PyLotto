@@ -1,5 +1,5 @@
 from hotspot import HotSpot, fetcher;
-from hotspot.models import iticket, iprize, isession, iball, ibowl, istrategy, ipreds
+from hotspot.models import iticket, iprize, isession, iball, ibowl, istrategy, ipreds, idraw
 from hotspot.controllers import prizes
 import os, ssl
 
@@ -9,14 +9,19 @@ from random import choices as r_choices
 from session import Session
 
 
-#h = HotSpot();
+h = HotSpot();
+# print("Finding gaps ....")
+h.find_gaps_results(1,2493350)
+h.find_gaps_draws(1,2493350)
+h.find_gaps_depths(1,2493350)
+
 
 # ball = iball.iBall(1);
 # ball.set_score("Overall", 0.3);
 # ball.set_score("depth", 0.457)
 # print(ball.toString())
 
-#str = Strat_RAND_01_001();
+
 
 
 # pr = ipreds.iPreds(201938337);
@@ -26,9 +31,11 @@ from session import Session
 
 # print(pr.get_pred(1))
 
-ses = Session("hotspot");
-ses.run("rand_01_001", 1234);
-
+# ses = Session("hotspot");
+# ses.run("rand_01_001", 2277330, 10, 10, True);
+#ses.validateTickets(2277330)
+# ticket = iticket.iTicket(2277339);
+# ticket.validate();
 
 # bowl = ibowl.iBowl(80);
 # bowl.setScore(1, "num", 0.123);
@@ -48,3 +55,9 @@ ses.run("rand_01_001", 1234);
 # #print(a_score_overall)
 # print(bowl.pickRand(10))
 # print(bowl.pickWeightedRand(10, "num", True))
+
+# dr = idraw.iDraw(2277330);
+# dr.setup();
+# dr.setBin();
+# dr.db_update({'d_bin0140':dr.d_bin0140, 'd_bin4180': dr.d_bin4180}, {'draw_id':2277311})
+# print(dr.d_bin0140, " ", dr.d_bin4180)

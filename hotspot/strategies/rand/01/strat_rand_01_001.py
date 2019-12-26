@@ -17,8 +17,15 @@ class Strat_rand_01_001(RAND):
         super().register(self.STRAT_ID, self.STRAT, self.MAJOR, self.MINOR, self.DESC)
 
     def run(self, draw_id, no_tickets, no_picks):
-        print("Run from "+self.STRAT_ID)
+        pick_array = []
+        print("From "+self.STRAT_ID);
         print("Pick "+str(no_picks)+" nums and get "+str(no_tickets)+" tickets for Draw_Id "+str(draw_id))
+        
+        i=0;
+        while (i < no_tickets):
+            pick_array.append(super().pickRand(list(range(1,80)), no_picks));
+            i+=1;
+        return pick_array;
 
-        ticket = super().pickRand(list(range(1,80)), no_picks)
-        print(ticket)
+    def pickRand(self, no_picks):
+        return super().pickRand(no_picks)

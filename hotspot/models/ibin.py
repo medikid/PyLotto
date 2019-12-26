@@ -5,11 +5,12 @@ class iBin():
     bits=[];
 
     def __init__(self, b_int=0):
+        self.reset;
         self.bits = [];
         if b_int > 0: 
             self.bin = b_int;
         else: self.bin = 0;
-        self.reset;
+        
 
     def reset(self):
         self.bin = 0;

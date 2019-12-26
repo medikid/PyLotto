@@ -49,6 +49,7 @@ class iStrategy(Base, DBBase):
         self.db_save();
 
     def set_weights(self):
+        print("Setting weights")
         pass
 
     def get_combs(self):

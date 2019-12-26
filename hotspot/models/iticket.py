@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, Numeric, String, DateTime, Float, Boolean, LargeBinary, Binary, SmallInteger, BigInteger
+from sqlalchemy import Column, Integer, Numeric, String, DateTime, Float, Boolean, LargeBinary, Binary, SmallInteger, BigInteger, VARCHAR
 from sqlalchemy import select, delete, update, insert
 from sqlalchemy.ext.declarative import declarative_base
 
@@ -7,7 +7,7 @@ from wsgiref.handlers import format_date_time
 
 from hotspot.db import db_init;
 from hotspot.db.db_base import DBBase
-from hotspot.models import Base, ipick, iresult, idraw, ibin
+from hotspot.models import Base, ipick, iresult, idraw, ibin, iprize
 
 import numpy as np
 
@@ -19,8 +19,8 @@ class iTicket(Base, DBBase):
     draw_id=Column(Integer)
     picks_total=Column(Integer)
     opt_x=Column(Boolean)
-    strat_id=Column(String(11))
-    session_id=Column(BigInteger)
+    strat_id=Column(VARCHAR(11))
+    sess_id=Column(BigInteger)
     t1=Column(SmallInteger)
     t2=Column(SmallInteger)
     t3=Column(SmallInteger)
@@ -108,13 +108,13 @@ class iTicket(Base, DBBase):
     tx_match=Column(Boolean)
     t_prize=Column(Float(2, True))
     
-    tickDict={0:0}
+    tickDict=dict([(i,0) for i in range(1, 81) ])
     
-    def __init__(self, DrawID=0):
+    def __init__(self, tickID=0, drawID=0):
         self.reset()
-        self.tick_id=0;
-        self.draw_id=DrawID;
-        if (self.draw_id>0): self.setup()
+        self.tick_id=tickID;
+        self.draw_id=drawID;
+        if (self.tick_id>0): self.setup()
         
         super().setupDBBase(iTicket, iTicket.tick_id, self.tick_id)
     
@@ -139,15 +139,38 @@ class iTicket(Base, DBBase):
                 
     def derive_bin(self):
         return 0;
+
+    def setStratID(self, stratID):
+        self.strat_id = stratID;
+
+    def getStratID(self):
+        return self.strat_id;
+
+    def setSessionID(self, sessID):
+        self.sess_id = sessID;
+
+    def getSessionID(self):
+        return self.sess_id;
         
     def setup(self):
         d = self.db.session.query(iTicket).filter(iTicket.tick_id==self.tick_id).first();
         if d is not None:
+            self.picks_total=d.picks_total;
+            self.opt_x=d.opt_x
+            self.strat_id=d.strat_id
+            self.sess_id=d.sess_id
             for i in self.tickDict.keys():
                 if (i>0):
                     setattr(self, "t"+str(i), getattr(d,"t"+str(i)) )
-                    self.drawDict[i]=getattr(self, "t"+str(i))
-        
+                    #self.drawDict[i]=getattr(self, "t"+str(i))
+            self.tx=d.tx
+            self.t_bin0140=d.t_bin0140
+            self.t_bin4180=d.t_bin4180
+            self.t_matches=d.t_matches
+            self.tx_match=d.tx_match
+            self.t_prize=d.t_prize
+    
+
     def toString(self):
         return str(self.get_dict())  + "[" + str(self.tx)+"]"
             
@@ -160,7 +183,44 @@ class iTicket(Base, DBBase):
     def get_picks_size(self):
         return self.picks_total;
 
-    def fill_ticket(self, pick_array, pick_x=0):
+    def derive_prize(self):
+        pr = iprize.iPrize(self.picks_total, self.t_matches);
+        if (self.tx == 1):
+            self.t_prize = pr.prize_x;
+        else: self.t_prize = pr.prize;
+        
+
+    def validate(self, drawID, d_bin0140, d_bin4180):
+        t_matches=0;
+        if (self.draw_id ==  drawID):      
+            t_match_0140 = d_bin0140 & self.t_bin0140
+            t_match_4180 = d_bin4180 & self.t_bin4180
+            print("Draw 1-40:   ", '{0:040b}'.format(d_bin0140))
+            print("Ticket 1-40: ", '{0:040b}'.format(self.t_bin0140))
+            print("Match 1-40:  ", '{0:040b}'.format(t_match_0140))
+            print("             ")
+            print("Draw 41-80:   ", '{0:040b}'.format(d_bin0140))
+            print("Ticket 41-80: ", '{0:040b}'.format(self.t_bin4180))
+            print("Match 41-80:  ", '{0:040b}'.format(t_match_4180))
+
+            t_matches += bin(t_match_0140).count("1")
+            t_matches += bin(t_match_4180).count("1")
+        self.t_matches = t_matches;
+
+        self.derive_prize();
+
+        #update db
+        #self.db_update({'t_matches':self.t_matches, 'tx_match': self.tx_match, 't_prize':self.t_prize},{'tick_id': self.tick_id})
+        #self.db_update({iTicket.t_matches:self.t_matches, iTicket.tx_match: self.tx_match, iTicket.t_prize:self.t_prize},{iTicket.tick_id: self.tick_id})
+        
+        query = self.db.session.query(iTicket).filter(iTicket.tick_id == self.tick_id).update({iTicket.t_matches:self.t_matches, iTicket.tx_match: self.tx_match, iTicket.t_prize:self.t_prize}, synchronize_session='fetch');
+        self.db.session.commit()
+
+
+
+    def fill_ticket(self, drawID, pick_array, pick_x=0):
+        print("Filling ticket for", pick_array)
+        self.draw_id = drawID
         b0140 = ibin.iBin();
         b4180 = ibin.iBin();
         bx = ibin.iBin();

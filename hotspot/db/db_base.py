@@ -6,6 +6,7 @@ Created on Dec 22, 2017
 
 from sqlalchemy import Column, Integer, Numeric, String, DateTime, Float, Boolean
 from sqlalchemy import select, delete, update, insert, exc
+from sqlalchemy import func, distinct
 from sqlalchemy.ext.declarative import declarative_base
 
 from hotspot.db import db_init;
@@ -140,3 +141,28 @@ class DBBase():
             self.db.session.commit()
             #print('Object saved')
             return self
+
+    def db_update(self, update_key_values, filter_key_values, isExchangeSpecific=False):
+        filter_statement = ''; update_statement=''
+        if (isExchangeSpecific==True): filter_statement += self.__className.exchange_id == self.exchange_id;
+        i=0;
+        for k,v in filter_key_values.items():
+            if(i > 0):filter_statement += ',';
+            filter_statement += k + '=' + str(v);
+            i+=1;
+        
+
+        z=0
+        for x,y in update_key_values.items():
+            if(z > 0):update_statement += ',';
+            update_statement += x + '=' + str(y);
+            z+=1;
+
+        #print("Update: ", update_statement, " Filter By: ", filter_statement)
+
+        query = self.db.session.query(self.__className).filter(filter_statement).update(update_key_values, synchronize_session='fetch');
+        self.db.session.commit()
+
+    def get_max(self, key):
+        value = 0;
+        query =  self.db.session.query(self.__className, label("Max Prize", func.max(key)));

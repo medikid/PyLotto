@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, Numeric, String, DateTime, Float, Boolean
+from sqlalchemy import Column, Integer, Numeric, String, DateTime, Float, Boolean, BigInteger
 from sqlalchemy import select, delete, update, insert
 from sqlalchemy.ext.declarative import declarative_base
 
@@ -7,7 +7,7 @@ from wsgiref.handlers import format_date_time
 
 from hotspot.db import db_init;
 from hotspot.db.db_base import DBBase
-from hotspot.models import Base, ipick, iresult
+from hotspot.models import Base, ipick, iresult, ibin
 
 import numpy as np
 
@@ -97,6 +97,8 @@ class iDraw(Base, DBBase):
     n79=Column(Integer)
     n80=Column(Integer)
     mega=Column(Integer)
+    d_bin0140=Column(BigInteger)
+    d_bin4180=Column(BigInteger)
     
     drawDict={0:0}
     
@@ -117,20 +119,53 @@ class iDraw(Base, DBBase):
     def derive(self):
         if (self.draw_id>0):
             self.reset()
+            b0140 = ibin.iBin();
+            b4180 = ibin.iBin();
+
             r = iresult.iResult(self.draw_id);
             r.setup(); #setup from db
             self.mega=r.mega
             for x in r.pick.getArray():
                 setattr(self,"n"+str(x),1)
-                self.drawDict[x]=1 
+                self.drawDict[x]=1
+                if x > 40:
+                    posn = x - 40;
+                    b4180.set_bit(posn);
+                else: b0140.set_bit(x)
+            
+
+            self.d_bin0140 = b0140.get_bin(); #770947678208
+            self.d_bin4180 = b4180.get_bin();  #8606711840
+
+    def setBin(self):
+        i =1; b0140 = ibin.iBin(); b4180 = ibin.iBin();
+        while (i <= 80):
+            dr = getattr(self,"n"+str(i))
+            if dr == 1:
+                if i > 40:
+                    b4180.set_bit(i)
+                else: b0140.set_bit(i)
+            i += 1;
+        self.d_bin0140 = b0140.get_bin(); #833831981626 for 2277311
+        self.d_bin4180 = b4180.get_bin();  #206435647488 for 2277311
+
+        #update db
+
+        d = self.db.session.query(iDraw).filter(iDraw.draw_id==self.draw_id).update({iDraw.d_bin0140:self.d_bin0140, iDraw.d_bin4180:self.d_bin4180}, synchronize_session='fetch')
+        self.db.session.commit()
         
     def setup(self):
         d = self.db.session.query(iDraw).filter(iDraw.draw_id==self.draw_id).first();
+
         if d is not None:
+            
             for i in self.drawDict.keys():
                 if (i>0):
                     setattr(self, "n"+str(i), getattr(d,"n"+str(i)) )
                     self.drawDict[i]=getattr(self, "n"+str(i))
+            self.mega=d.mega
+            self.d_bin0140=d.d_bin0140
+            self.d_bin4180=d.d_bin4180
         
     def toString(self):
         return str(self.get_dict())  + "[" + str(self.mega)+"]"
