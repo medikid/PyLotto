@@ -28,6 +28,7 @@ class Fetcher():
         doc = BeautifulSoup(response.data, 'html.parser');
         
         drw = doc.find("div",{"class":"card-body"});
+        draw_id = drw.find("strong",{"class":"current-drawNumber"}).get_text().strip();
         dttm = drw.find("p",{"class":"htspt__cards--next-draw-date"}).get_text().strip().split(":")
         date=dttm[1].split("\n")[0].strip()
         time_hr="{:02d}".format(int(dttm[2]))
@@ -54,7 +55,7 @@ class Fetcher():
         print(draw_date_time, pick_array, "bonus",pick_mega);
         
         pick=ipick.iPick(pick_array)
-        r = iresult.iResult(DrawID, draw_date_time, pick , pick_mega )
+        r = iresult.iResult(draw_id, draw_date_time, pick , pick_mega )
         return r;
 
     
@@ -151,13 +152,16 @@ class Fetcher():
         res = iresult.iResult();
         last_draw_id=res.getLastDrawID();
         next_draw_id = last_draw_id + 1;
+        fetch = True;
         #print(last_draw_id)
-        while(True):
+        while(fetch):
             new_res = self.fetch_result(next_draw_id)
-            new_res.db_save()
-            next_draw_id += 1;
+            if (new_res.draw_id == next_draw_id):
+                new_res.db_save()
+                next_draw_id += 1;
+            else: fetch = False;
         
     
-f = Fetcher()
+#f = Fetcher()
 #f.sync_results()
 #f.fetch_results(2357100, 2357100) #2381149)
