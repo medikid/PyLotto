@@ -1,0 +1,9 @@
+RUNNING SCRIPTS
+
+#missing module
+run sudo python boot_strap.py
+
+#missing pip
+restart workspace
+sudo apt-get install python-setuptools
+or sudo easy_install pip

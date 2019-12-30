@@ -3,6 +3,7 @@ from hotspot.models import iticket, iprize, isession
 from hotspot.controllers import prizes
 import os, ssl
 
+#setup by sudo python boot_strap.py
 #run py in background - nohup python main.py &
 #find main.py process - ps ax | grep main.py
 #kill pid - kill pid or pkill -f main.pypyno
