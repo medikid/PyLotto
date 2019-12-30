@@ -4,7 +4,7 @@ from hotspot.controllers import prizes
 import os, ssl
 
 from numpy.random import choice as np_choice
-from random import choices as r_choices
+import random as r
 
 from session import Session
 
