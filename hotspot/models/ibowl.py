@@ -1,8 +1,7 @@
 from hotspot.models import iball
 
 from numpy.random import choice as np_choice
-from random import choices as r_choices
-
+import random as r
 
 class iBowl:
     _size=0;
@@ -68,7 +67,7 @@ class iBowl:
 
         if (np==True):
             picks = np_choice(sampleArray, pick_n)
-        else: picks = r_choices(sampleArray, k=pick_n)
+        else: picks = r.choices(sampleArray, k=pick_n)
         picks.sort();
 
         return picks;
@@ -80,7 +79,7 @@ class iBowl:
 
         if (np==True):
             picks = np_choice(sampleArray, pick_n, weightsArray)
-        else: picks = r_choices(sampleArray, weightsArray, k=pick_n,  replace=False)
+        else: picks = r.choices(sampleArray, weightsArray, k=pick_n,  replace=False)
         picks.sort();
         
         return picks;
