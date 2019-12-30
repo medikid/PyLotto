@@ -10,10 +10,21 @@ from session import Session
 
 
 h = HotSpot();
-# print("Finding gaps ....")
-h.find_gaps_results(1,2493350)
-h.find_gaps_draws(1,2493350)
-h.find_gaps_depths(1,2493350)
+print(h.get_last_draw_id())
+h.find_gaps_results(1,2549397)
+h.find_gaps_draws(1,2549397)
+h.find_gaps_depths(1,2549397)
+
+#//replaced on 1268 pymysql/connection.py
+#self.server_charset = charset_by_id(lang).name
+            #//// replaced to fix KEY ERROR 255
+            #try:
+                #self.server_charset = charset_by_id(lang).name
+            #except KeyError:
+                #self.server_charset = None
+            #/////
+#/replaced line 1569 sqlalchemy/dialetcts/base.py
+#('SELECT @@tx_isolation') #replaced tx_isolation with transaction_isolation
 
 
 # ball = iball.iBall(1);
