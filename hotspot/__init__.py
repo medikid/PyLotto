@@ -126,6 +126,18 @@ class HotSpot:
         gaps.append(next_id);
         print("Gaps Depths:", gaps);
         
+    def find_gaps(self, start_id=0, end_id=0):
+        res = iresult.iResult();
+        min_id = res.get_min('draw_id');
+        max_id = res.get_max('draw_id');
+        if (start_id == 0):
+            start_id = min_id;
+        if (end_id == 0):
+            end_id = max_id;
+        
+        self.find_gaps_results(start_id, end_id);
+        self.find_gaps_draws(start_id, end_id);
+        self.find_gaps_depths(start_id, end_id);
     
     
     def sync(self):
@@ -266,6 +278,6 @@ class HotSpot:
         np.savez(data_folder+'val_3', ids=master_ids[34000:35000], val=master_depths[34000:35000], target=master_draws[34001:35001]);
         np.savez(data_folder+'test_3', ids=master_ids[35000:36000], test=master_depths[35000:36000], target=master_draws[35001:36001]);
            
-h = HotSpot();
+#h = HotSpot();
 #h.sync()
 #print(h.save_master_matrix())

@@ -10,10 +10,14 @@ from session import Session
 
 
 h = HotSpot();
-print(h.get_last_draw_id())
-h.find_gaps_results(1,2549397)
-h.find_gaps_draws(1,2549397)
-h.find_gaps_depths(1,2549397)
+#print(h.get_last_draw_id())
+#h.find_gaps_results(1,2549397)
+#h.find_gaps_draws(1,2549397)
+#h.find_gaps_depths(1,2549397)
+h.find_gaps();
+
+#dr = idraw.iDraw();
+#print(dr.get_min('draw_id'));
 
 #//replaced on 1268 pymysql/connection.py
 #self.server_charset = charset_by_id(lang).name

@@ -164,10 +164,13 @@ class DBBase():
         self.db.session.commit()
 
     def get_max(self, key):
-        value = 0;
-        query =  self.db.session.query(self.__className, label("Max Prize", func.max(key)));
-    #     return self.db.session.commit();
+        query = select([func.max(getattr(self.__className, key))])        
+        max = self.db.session.execute(query).scalar();
+        
+        return max;
 
-    # def get_min(self, key):
-    #     query = self.db.session.query(self.__className, label("Max Prize", func.min(key)));
-    #     return self.db.session.commit();
+    def get_min(self, key):
+        query = select([func.min(getattr(self.__className, key))])        
+        min = self.db.session.execute(query).scalar();
+              
+        return min;
