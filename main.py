@@ -21,10 +21,11 @@ h = HotSpot();
 h.sync()
 #.setupTickets();
 
-#p = prizes.Prizes();
-#p.setup_prize_list()
-#prz = p.get_prize(10,5);
-#print("Prize ID", prz.prz_id,": ", prz.prize);
+
+# p = prizes.Prizes();
+# p.setup_prize_list()
+# prz = p.get_prize(10,5);
+# print("Prize ID", prz.prz_id,": ", prz.prize);
 
 #h.derive_draws(2439018, 2494108);
 #h.derive_depths(2439018, 2494107)

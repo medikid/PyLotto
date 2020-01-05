@@ -143,24 +143,27 @@ class HotSpot:
     def sync(self):
         last_draw_id = self.get_last_draw_id();
         next_draw_id = last_draw_id + 1;
+        fetch = True;
         f = Fetcher();
-        while(True):
+        while(fetch):
             print("Syncing "+str(next_draw_id))
             new_res = f.fetch_result(next_draw_id)
             #print(new_res.toString())
-            new_res.db_save()
+            if (int(new_res.draw_id) == int(next_draw_id)):
+                new_res.db_save()
             
-            new_draw=idraw.iDraw(next_draw_id)
-            new_draw.derive()
-            new_draw.db_save()
-            new_draw.toString()
-              
-            new_depth=idepth.iDepth(next_draw_id);
-            new_depth.derive();
-            new_depth.db_save()
-            new_depth.toString()          
-             
-            next_draw_id += 1;
+                new_draw=idraw.iDraw(next_draw_id)
+                new_draw.derive()
+                new_draw.db_save()
+                new_draw.toString()
+                
+                new_depth=idepth.iDepth(next_draw_id);
+                new_depth.derive();
+                new_depth.db_save()
+                new_depth.toString()          
+                
+                next_draw_id += 1;
+            else: fetch = False;
         print("All Done!")
     
     def get_all_results(self):            
