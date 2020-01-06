@@ -1,6 +1,8 @@
 from hotspot import HotSpot, fetcher;
 from hotspot.models import iticket, iprize, isession, iball, ibowl, istrategy, ipreds, idraw
 from hotspot.controllers import prizes
+from hotspot.explore import Explore
+from hotspot.explore.algos import prev_wins
 import os, ssl
 
 from numpy.random import choice as np_choice
@@ -9,12 +11,23 @@ import random as r
 from session import Session
 
 
-h = HotSpot();
+#h = HotSpot();
 #print(h.get_last_draw_id())
 #h.find_gaps_results(1,2549397)
 #h.find_gaps_draws(1,2549397)
 #h.find_gaps_depths(1,2549397)
-h.find_gaps();
+#h.find_gaps();
+
+### EXPLORE ######
+#e = Explore('PREV_WINS', 2566556, 5);
+#e.run()
+
+p = prev_wins.PREV_WINS(2566556, 500, True);
+p.explore();
+p.print_summary()
+
+
+#################
 
 #dr = idraw.iDraw();
 #print(dr.get_min('draw_id'));

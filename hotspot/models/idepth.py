@@ -143,3 +143,14 @@ class iDepth(Base, DBBase):
     def toString(self):
         return str(self.get_dict()) + "[" + str(self.mega)+"]"
 
+    def __get_dict__(self):
+        dic = {};
+        dic[self.draw_id] = {};
+
+        i = 1;
+        while (i <=80):
+            dic[self.draw_id][i] = getattr(self, "n"+str(i));
+            i += 1;
+
+        return dic;      
+

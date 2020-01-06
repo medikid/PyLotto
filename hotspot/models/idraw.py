@@ -176,4 +176,13 @@ class iDraw(Base, DBBase):
         dict[self.draw_id]=np.array([self.n1, self.n2, self.n3, self.n4, self.n5, self.n6, self.n7, self.n8, self.n9, self.n10, self.n11, self.n12, self.n13, self.n14, self.n15, self.n16, self.n17, self.n18, self.n19, self.n20, self.n21, self.n22, self.n23, self.n24, self.n25, self.n26, self.n27, self.n28, self.n29, self.n30, self.n31, self.n32, self.n33, self.n34, self.n35, self.n36, self.n37, self.n38, self.n39, self.n40, self.n41, self.n42, self.n43, self.n44, self.n45, self.n46, self.n47, self.n48, self.n49, self.n50, self.n51, self.n52, self.n53, self.n54, self.n55, self.n56, self.n57, self.n58, self.n59, self.n60, self.n61, self.n62, self.n63, self.n64, self.n65, self.n66, self.n67, self.n68, self.n69, self.n70, self.n71, self.n72, self.n73, self.n74, self.n75, self.n76, self.n77, self.n78, self.n79, self.n80])
         return dict;
 
+    def __get_dict__(self):
+        dic = {};
+        dic[self.draw_id] = {};
 
+        i = 1;
+        while (i <=80):
+            dic[self.draw_id][i] = getattr(self, "n"+str(i));
+            i += 1;
+
+        return dic;
