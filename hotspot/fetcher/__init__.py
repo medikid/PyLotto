@@ -5,11 +5,61 @@ from utils import Utils
 
 from hotspot.models import iresult, ipick
 from nbconvert.exporters.base import export
-import datetime
+import datetime, time
+
+import pandas as pd
 #from keno.fetcher import Fetcher
 
 
 class Fetcher():
+    def __init__(self):
+        urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+
+    def fetch_result_dict(self, DrawID):        
+        new_url="https://www.calottery.com/draw-games/hot-spot/past-winning-numbers?query="        
+        url_str=new_url+str(DrawID);
+        
+        
+        http = urllib3.PoolManager(cert_reqs='CERT_REQUIRED', ca_certs=certifi.where())
+        response = http.request('GET', url_str)
+        doc = BeautifulSoup(response.data, 'html.parser');
+        
+        drw = doc.find("div",{"class":"card-body"});
+        draw_id = drw.find("strong",{"class":"current-drawNumber"}).get_text().strip();
+        dttm = drw.find("p",{"class":"htspt__cards--next-draw-date"}).get_text().strip().split(":")
+        date=dttm[1].split("\n")[0].strip()
+        time_hr="{:02d}".format(int(dttm[2]))
+        time_mn_am=dttm[3].split(" ")
+        time_mn=time_mn_am[0]
+        time_ampm=time_mn_am[1].split(".")
+        time_AMPM=time_ampm[0].upper()+time_ampm[1].upper()
+        str_dttm = date + " " +time_hr +":"+ time_mn +" " + time_AMPM
+        dttm_format="%B %d, %Y %I:%M %p"
+        
+        draw_date_time = Utils.parseDateTime(str_dttm, dttm_format)
+        
+        uls = drw.find("ul", {"class": "list-inline"});
+        lis = uls.find_all("li", {"class": "list-inline-item blue-num"});
+        lis_bonus = uls.find("li", {"class": "list-inline-item yellow-num"});
+        
+        r_dict = {'draw_id': draw_id, 'date_time': draw_date_time}
+
+        i=1;
+        pick_mega=0;
+        for li in lis:    
+            r_dict['r'+str(i)] = int(li.get_text())
+
+            i += 1
+        
+        r_dict['r20'] = int(lis_bonus.get_text());
+        r_dict['mega'] =  int(lis_bonus.get_text())
+
+        #r = iresult.iResult(**r_dict);
+        #print(r)
+        #print(r_dict)
+        #print(pd.DataFrame([r_dict]))
+
+        return r_dict;
 
     def fetch_result(self, DrawID):
         #url="https://www.californialottery.com/sitecore/content/LotteryHome/play/draw-games/hot-spot/draw-detail?draw=";
@@ -58,6 +108,57 @@ class Fetcher():
         r = iresult.iResult(draw_id, draw_date_time, pick , pick_mega )
         return r;
 
+    def fetch_df(self, DrawID):        
+        new_url="https://www.calottery.com/draw-games/hot-spot/past-winning-numbers?query="
+        
+        url_str=new_url+str(DrawID);
+        
+        urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)      
+        http = urllib3.PoolManager(cert_reqs='CERT_REQUIRED', ca_certs=certifi.where())
+        response = http.request('GET', url_str)
+        doc = BeautifulSoup(response.data, 'html.parser');
+        
+        drw = doc.find("div",{"class":"card-body"});
+        draw_id = drw.find("strong",{"class":"current-drawNumber"}).get_text().strip();
+        dttm = drw.find("p",{"class":"htspt__cards--next-draw-date"}).get_text().strip().split(":")
+        date=dttm[1].split("\n")[0].strip()
+        time_hr="{:02d}".format(int(dttm[2]))
+        time_mn_am=dttm[3].split(" ")
+        time_mn=time_mn_am[0]
+        time_ampm=time_mn_am[1].split(".")
+        time_AMPM=time_ampm[0].upper()+time_ampm[1].upper()
+        str_dttm = date + " " +time_hr +":"+ time_mn +" " + time_AMPM
+        dttm_format="%B %d, %Y %I:%M %p"
+        
+        draw_date_time = Utils.parseDateTime(str_dttm, dttm_format)
+        
+        uls = drw.find("ul", {"class": "list-inline"});
+        lis = uls.find_all("li", {"class": "list-inline-item blue-num"});
+        lis_bonus = uls.find("li", {"class": "list-inline-item yellow-num"});
+
+        r_dict = {'draw_id': draw_id, 'date_time': draw_date_time}
+              
+        #pick_array=[]
+        pick_mega=0;
+        i=1;
+        for li in lis:            
+            #pick_array.append(int(li.get_text()))
+            r_dict['r'+str(i)] = int(li.get_text())
+            i += 1;
+        
+        pick_mega=int(lis_bonus.get_text());
+        #pick_array.append(int(pick_mega))
+        r_dict['r20'] = pick_mega;
+        r_dict['mega'] = pick_mega;
+        #print(draw_date_time, pick_array, "bonus",pick_mega);
+        
+        # pick=ipick.iPick(pick_array)
+        # r = iresult.iResult(draw_id, draw_date_time, pick , pick_mega )
+
+        #df = pd.DataFrame([r_dict])
+        #df =  pd.Series(r_dict).to_frame()
+        df = pd.DataFrame.from_records([r_dict], index=[0])
+        return df;
     
     def fetch_result_old(self, DrawID):
         #url="https://www.californialottery.com/sitecore/content/LotteryHome/play/draw-games/hot-spot/draw-detail?draw=";
@@ -152,14 +253,42 @@ class Fetcher():
         res = iresult.iResult();
         last_draw_id=res.getLastDrawID();
         next_draw_id = last_draw_id + 1;
-        fetch = True;
-        #print(last_draw_id)
+        fetch = True;         #print(last_draw_id)
+        buffer = 10;        #print(last_draw_id)
         while(fetch):
             new_res = self.fetch_result(next_draw_id)
-            if (new_res.draw_id == next_draw_id):
+            if (int(new_res.draw_id) == int(next_draw_id)):
                 new_res.db_save()
                 next_draw_id += 1;
-            else: fetch = False;
+            elif (buffer > 0):
+                print("Buffer=" + str(buffer) + " [ " + str(new_res.draw_id) + " != " + str(next_draw_id) + " ]")
+                new_res = self.fetch_result(next_draw_id)
+                if (int(new_res.draw_id) == int(next_draw_id)):
+                    new_res.db_save()
+                    next_draw_id += 1;
+                buffer -= 1;                
+            else:
+                fetch = False;
+
+    def sync_results_df(self):
+        start_time = time.time()
+        res = iresult.iResult();
+        last_db_draw_id=res.getLastDrawID();
+        cur_draw = self.fetch_result_dict(0)
+        cur_draw_id = int(cur_draw['draw_id']);
+        print("Fetching {} to {}".format(str(last_db_draw_id), str(cur_draw_id)))
+        print(res.__table__.columns.keys())
+
+        results = pd.DataFrame([], columns=iresult.iResult.__table__.columns.keys());
+        i = last_db_draw_id+1;
+        end = cur_draw_id;
+        while(i <= end):
+            r_dict = self.fetch_result_dict(i);
+            results.append([r_dict])
+        
+        print("Fetched from %i to %i in %i seconds" % (last_db_draw_id, cur_draw_id, (time.time() - start_time)))
+        print(results.head())
+        print(results.tail())
         
     
 #f = Fetcher()

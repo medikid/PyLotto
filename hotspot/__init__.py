@@ -5,6 +5,7 @@ from hotspot.db import db_init;
 from hotspot.db.db_base import DBBase
 
 import numpy as np
+import timeit
 
 class HotSpot:
     db=db_init()
@@ -138,32 +139,26 @@ class HotSpot:
         self.find_gaps_results(start_id, end_id);
         self.find_gaps_draws(start_id, end_id);
         self.find_gaps_depths(start_id, end_id);
-    
-    
-    def sync(self):
-        last_draw_id = self.get_last_draw_id();
-        next_draw_id = last_draw_id + 1;
-        fetch = True;
+        
+        
+    def fetch_single_draw(self, DrawID):
         f = Fetcher();
-        while(fetch):
-            print("Syncing "+str(next_draw_id))
-            new_res = f.fetch_result(next_draw_id)
-            #print(new_res.toString())
-            if (int(new_res.draw_id) == int(next_draw_id)):
-                new_res.db_save()
+        res = f.fetch_result(DrawID);
+        if (int(res.draw_id) == int(DrawID)):
+            res.db_save();
             
-                new_draw=idraw.iDraw(next_draw_id)
-                new_draw.derive()
-                new_draw.db_save()
-                new_draw.toString()
+            new_draw=idraw.iDraw(DrawID)
+            new_draw.derive()
+            new_draw.db_save()
                 
-                new_depth=idepth.iDepth(next_draw_id);
-                new_depth.derive();
-                new_depth.db_save()
-                new_depth.toString()          
-                
-                next_draw_id += 1;
-            else: fetch = False;
+            new_depth=idepth.iDepth(DrawID);
+            new_depth.derive();
+            new_depth.db_save()
+    
+    
+    def sync(self, total_draws=0):
+        f = Fetcher();
+        f.sync_results();        
         print("All Done!")
     
     def get_all_results(self):            
@@ -234,7 +229,7 @@ class HotSpot:
         return val_obs;
     
     def save_master_matrix(self):
-        data_folder='strategies/data/'
+        data_folder='strategies/ai/data/'
         master_results_d = self.get_all_results();
         master_draws_d = self.get_all_draws();
         master_depths_d = self.get_all_depths();

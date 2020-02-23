@@ -20,7 +20,10 @@ ssl._create_default_https_context = ssl._create_unverified_context
 h = HotSpot();
 h.sync()
 #.setupTickets();
-
+#h.fetch_single_draw(2546421)
+#h.fetch_single_draw(2546534)
+#h.fetch_single_draw(2547405)
+#h.fetch_single_draw(2548577)
 
 # p = prizes.Prizes();
 # p.setup_prize_list()

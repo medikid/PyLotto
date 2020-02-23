@@ -10,3 +10,5 @@ bs4
 numpy
 flask
 nbconvert
+pandas
+xlsxwriter

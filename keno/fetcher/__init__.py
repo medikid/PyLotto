@@ -1,11 +1,72 @@
-import urllib3
+import urllib3, certifi, requests
 from bs4  import BeautifulSoup
 from utils import Utils
 
 from keno.models import iresult, ipick
-import csv, io
+from keno.db import db_init;
+from keno.db.db_base import DBBase
+
+import csv, io, zipfile
+
+certifi, requests
+
+import pandas as pd
+from requests.packages.urllib3.exceptions import InsecureRequestWarning
 
 class Fetcher():
+    db = db_init();
+    
+    def get_zip_files_by_url(self, z_url):
+        #z_url = "http://www.bclc.com/DownloadableNumbers/CSV/KenoCurrentYear.zip"
+        #z_url = "http://www.bclc.com/DownloadableNumbers/CSV/KenoPastYears.zip"
+
+        headers= { 'User-Agent' : 'Mozilla/5.0 (Windows NT 6.1; Win64; x64)' }
+        
+        requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
+        
+        content = requests.get(z_url, verify=False, headers=headers)
+        zipfiles = zipfile.ZipFile(io.BytesIO(content.content))
+        return zipfiles;
+
+    def read_zipped_csv(self, z_url=None, filename=None):
+        zipfiles = self.get_zip_files_by_url(z_url);
+        df = pd.read_csv(zipfiles.open(filename));
+        results= pd.DataFrame();
+        results['draw_id'] = df['DRAW NUMBER'].astype('int64');
+        #results['data_time'] = pd.datetime(df['DRAW DATE'], format='%Y-%m-%d %H:%M:%S', errors='ignore');
+        results['date_time'] = df['DRAW DATE'].astype('datetime64[ns]');
+        i=1;
+        while (i <= 20):
+            results['r'+str(i)] = df['NUMBER DRAWN ' + str(i)].astype('int64');
+            i += 1;
+        results['mega'] = df['BONUS MULTIPLIER'].astype('float')
+        results.set_index('draw_id', inplace=True)
+        results.index = results.index.astype('int64')
+        #print(results[results.index >2312060].head())
+        return results;
+
+    def upload_dataframe(self, data_frame, table_name='results'):
+        # query = (' SELECT MAX(`draw_id`) FROM {}').format(table_name)
+        # df = pd.read_sql(query, con=self.db.db_engine)
+        # print(df)
+        data_frame.to_sql(name=table_name, con=self.db.db_engine, if_exists='append', index=True)
+
+
+    def fetch_online_csv(self):
+        cur_year_zip = "http://www.bclc.com/DownloadableNumbers/CSV/KenoCurrentYear.zip"
+        prev_years_zip = "http://www.bclc.com/DownloadableNumbers/CSV/KenoPastYears.zip"
+
+        cur_file_name = 'KenoCurrentYear.csv'
+        prev_file_name = 'KenoYear2019.csv'
+
+        results = self.read_zipped_csv(cur_year_zip, cur_file_name);
+        #results = self.read_zipped_csv(prev_years_zip, prev_file_name);
+
+        #print(results[results.index >2312063].head())
+
+        self.upload_dataframe(results, 'results')
+
+        return results[results.index >2312063]
     
     def fetch_csv_results(self):
         data_folder='../results/';
@@ -15,7 +76,7 @@ class Fetcher():
             csvFileList.append("YR"+str(i)+"AKENO.csv");
             csvFileList.append("YR"+str(i)+"BKENO.csv");
             i+=1
-        
+            
         for csvFileName in csvFileList:
             path=data_folder+csvFileName;
             self.fetch_csv_file(path);

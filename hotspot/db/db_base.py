@@ -16,6 +16,8 @@ from datetime import datetime
 from utils import Utils;
 #from MySQLdb.constants.FLAG import AUTO_INCREMENT
 
+import pandas as pd
+
 try:
     import pymysql
     pymysql.install_as_MySQLdb()
@@ -80,7 +82,7 @@ class DBBase():
         
     def db_save(self):
         try:
-            self.db_get_or_create()
+            return self.db_get_or_create()
         except exc.IntegrityError as e:
             self.db.session.rollback()
 #         self.db.session.add(self)
@@ -138,9 +140,8 @@ class DBBase():
             return instance
         else:
             self.db.session.add(self)
-            self.db.session.commit()
+            return self.db.session.commit()
             #print('Object saved')
-            return self
 
     def db_update(self, update_key_values, filter_key_values, isExchangeSpecific=False):
         filter_statement = ''; update_statement=''
@@ -174,3 +175,27 @@ class DBBase():
         min = self.db.session.execute(query).scalar();
               
         return min;
+
+    def get_dataframe(self, filterKeys=None, filterOperators=None, filterValues=None, isExchangeSpecific=False):
+        filter_statement = '';
+        query = self.db.session.query(self.__className);
+
+        if (isExchangeSpecific==True): filter_statement += self.__className.exchange_id == self.exchange_id;
+        
+        if (filterKeys == None):
+            query = query;
+        else:
+            for i in range(len(filterKeys)):
+                if(i > 0):filter_statement += ',';
+                filter_statement += filterKeys[i] + filterOperators[i] + filterValues[i];
+        
+                ### CONCATENATION OF FILTERSTATEMENT DOES NOT WORK, you
+            query = query.filter(filter_statement);
+        query = query.order_by(self.__primaryKeyField.asc())
+        print(filter_statement);
+        df = pd.read_sql(query.statement, self.db.session.bind)
+        #df = df.set_index(self.__primaryKeyField)
+        return df;
+
+    def upload_dataframe(self, df, upload_index=True):
+        df.to_sql(name=self.__tablename, con=self.db.db_engine, if_exists='append', index=upload_index)

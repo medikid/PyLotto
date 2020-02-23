@@ -18,7 +18,7 @@ class iValidation:
     def validate(self, ticketID):
         tk = iticket.iTicket(ticketID)
         tk.setup();
-        match0180 = 
+        match0180 = 0
         pass;
     
     def get_bin0140(self):
