@@ -5,15 +5,14 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import Integer, DateTime
 from wsgiref.handlers import format_date_time
 
-from keno.db import db_init;
-from keno.db.db_base import DBBase
-from keno.models import Base, ipick, iresult, idraw
+from hotspot.db import db_init;
+from hotspot.db.db_base import DBBase
+from hotspot.models import Base, ipick, iresult, idraw
 
 import numpy as np
 
 class iDepth(Base, DBBase):
-    __tablename__ = 'depths'    
-    __table_args__ = {'extend_existing': True}
+    __tablename__ = 'depths'
     db = db_init();
     
     draw_id=Column(Integer,primary_key=True, autoincrement=False)
@@ -154,3 +153,4 @@ class iDepth(Base, DBBase):
             i += 1;
 
         return dic;      
+

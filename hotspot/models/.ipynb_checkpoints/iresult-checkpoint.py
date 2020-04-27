@@ -2,18 +2,17 @@ from sqlalchemy import Column, Integer, Numeric, String, DateTime, Float, Boolea
 from sqlalchemy import select, delete, update, insert
 from sqlalchemy.ext.declarative import declarative_base
 
-from sqlalchemy import Integer, DateTime
+from sqlalchemy import Integer, DateTime, func
 from wsgiref.handlers import format_date_time
 
-from keno.db import db_init;
-from keno.db.db_base import DBBase
-from keno.models import Base, ipick
+from hotspot.db import db_init;
+from hotspot.db.db_base import DBBase
+from hotspot.models import Base, ipick
 
 import numpy as np
 
 class iResult(Base, DBBase):
     __tablename__ = 'results'
-    __table_args__ = {'extend_existing': True}
     db = db_init();
     
     draw_id=Column(Integer,primary_key=True)
