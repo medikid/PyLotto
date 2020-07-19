@@ -78,7 +78,8 @@ class DBBase():
         return self.__primaryKeyValue
     
     def create_table(self):
-        self.base.metadata.create_all(self.db_engine);
+        self.base.metadata.create_all(self.db.db_engine);
+        # you can also create by obj.metadata.create_all(obj.db.db_engine)
         pass
         
     def db_save(self):

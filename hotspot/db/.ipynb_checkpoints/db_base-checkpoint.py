@@ -79,6 +79,7 @@ class DBBase():
     
     def create_table(self):
         self.base.metadata.create_all(self.db_engine);
+        # you can also create by obj.metadata.create_all(obj.db.db_engine)
         pass
         
     def db_save(self):
